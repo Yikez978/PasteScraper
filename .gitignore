@@ -1,0 +1,10 @@
+/pastescraper.log
+/scraped_data/
+.idea/
+Paste.pyc
+PasteScraper.pyc
+Pastebin.pyc
+QueueNG.pyc
+Site.pyc
+config.pyc
+regexes.pyc
