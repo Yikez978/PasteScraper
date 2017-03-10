@@ -1,12 +1,15 @@
+import os
 from re import match
-
 import logging
 
+from config import write_type_to_file
 from regexes import *
 
 class Paste(object):
 
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
         #body of text
         self.text = ""
         #metadata
@@ -40,13 +43,13 @@ class Paste(object):
 
         self.irc = 0
 
-        self.db = 0
+        self.db = []
 
-        self.html = 0
+        self.html = []
         self.timestamp = 0
-        self.blacklist = 0
-        self.crash_reports = 0
-        self.code_keywords = 0
+        self.blacklist = []
+        self.crash_reports = []
+        self.code_keywords = []
 
     #search paste for interesting key words, and assign a score based on what was found
     def match(self):
@@ -95,31 +98,61 @@ class Paste(object):
             self.type.append("irc")
 
         for regex in regexes['db_keywords']:
-            if regex.search(self.text):
-                #logging.debug("Paste {0} matching database keyword: %s".format(self.id, regex.search(self.text)))
-                self.db += 1
-            #print("Match on %r" % regex)
-        if self.db > 0:
+            match = regex.search(self.text)
+            if match:
+                self.db.append(match.group())
+        if self.db:
+            self.logger.debug("Paste {0} matching database keyword: {1}".format(self.id, self.db))
+        if len(self.db) > 0:
             self.type.append("db")
 
         for item in regexes['html']:
             if item in self.text:
-                #logging.debug("Paste {0} matching HTML keyword: {1]".format(self.id, item))
-                self.html += 1
+                self.html.append(item)
+        if self.html:
+            self.logger.debug("Paste {0} matching HTML keywords: {1}".format(self.id, self.html))
+
 
         self.timestamp = len(list(set(regexes['irc_channel'].findall(self.text))))
 
         for regex in regexes['blacklist']:
-            if regex.search(self.text):
-                #logging.debug("Paste {0} matching blacklist keyword: {1]".format(self.id, regex.search(self.text)))
-                self.blacklist += 1
+            match = regex.search(self.text)
+            if match:
+                self.blacklist.append(match.group())
+        if self.blacklist:
+            self.logger.debug("Paste {0} matching blacklist keywords {1}"
+                              .format(self.id, self.blacklist))
 
         for regex in regexes['crash_reports']:
-            if regex.search(self.text):
-                #logging.debug("Paste {0} matching crash_report keyword: {1]".format(self.id, regex.search(self.text)))
-                self.crash_reports += 1
+            match = regex.search(self.text)
+            if match:
+                self.crash_reports.append(match.group())
+        if self.crash_reports:
+            self.logger.debug("Paste {0} matching crash_report keywords {1}"
+                                .format(self.id, self.crash_reports))
+
 
         for keyword in regexes['code']:
             if keyword in self.text:
-                #logging.debug("Paste {0} matching code keyword: {1]".format(self.id, regex.search(self.text)))
-                self.code_keywords += 1
+                self.code_keywords.append(keyword)
+        if self.code_keywords:
+            self.logger.debug("Paste {0} matching code keywords {1}".format(self.id, self.code_keywords))
+
+    def save(self):
+        # MAKE SURE THIS WORKS ON LINUX
+        folder = os.path.join("scraped_data", str(self.site))
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
+        file = "{0}/{1}.txt".format(folder, self.id)
+        try:
+            with open(file, 'w') as paste_file:
+                if write_type_to_file:
+                    paste_file.write("[*] {0}\n".format(self.type))
+                paste_file.write(self.text)
+                self.logger.debug("Wrote paste {0} to file system successfully".format(self.id))
+        except IOError as error:
+            self.logger.error("Error writing paste {0} to file {1}: Error code {3}".format(
+                self.id, file, error))
+        finally:
+            paste_file.close()
