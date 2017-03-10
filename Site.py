@@ -43,10 +43,12 @@ class Site(object):
                 #self.logger.debug("Sending paste {0} to matcher".format(paste.id))
                 paste.match()
 
-                if not paste.type:
-                    self.logger.debug("Nothing interesting in paste {0}. Continuing".format(paste.id))
-
-                self.logger.info("Paste {0} from {1} has the following characteristics: {2}".format(paste.id, paste.site, paste.type))
+                if paste.type:
+                    self.logger.info("Paste {0} from {1} has the following positive characteristics: {2}".
+                                     format(paste.id, paste.site, paste.type))
+                else:
+                    self.logger.debug("Nothing interesting in paste {0}. Continuing".
+                                      format(paste.id))
 
                 if len(paste.html) >= threshhold_html:
                     self.logger.debug("Paste {0} was interesting, but reached HTML keyword threshhold".format(paste.id))
@@ -57,13 +59,13 @@ class Site(object):
                 if len(paste.code_keywords) >= threshhold_codekeyword:
                     self.logger.debug("Paste {0} was interesting, but reached code keyword threshhold".format(paste.id))
 
-                self.logger.debug("Paste {0} was interesting because of ".format(paste.id, paste.type))
-
                 paste.save()
 
                 # TODO: Logic for pastes with interesting keywords but has bad characteristics
                 # (i.e. code but with API keys, HTML but with hashes, etc
 
+            self.logger.debug("Going to sleep")
+            time.sleep(self.sleep)
 
             #get new pastes. returns false if we got banned
             self.logger.debug("Searching for new pastes...")
@@ -74,8 +76,6 @@ class Site(object):
             else:
                 self.headID = self.queue.peek().id
                 self.logger.debug("Setting watchpoint at %s" % self.headID)
-                self.logger.debug("Going to sleep")
-                time.sleep(self.sleep)
 
 
 
