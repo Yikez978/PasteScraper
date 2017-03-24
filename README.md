@@ -1,3 +1,10 @@
+This project is a fork of Jordan Wright's Dumpmon for twitter.
+
+I've done some rewrites, removed Twitter functionality, and will be monitoring additional keywords of interest to me
+I also plan on monitoring some additional sites (Dumpmon currently monitors pastebin, pastie, and slexy). This code can be easily repurposed to constantly monitor anything for interesting characteristics
+
+Work is still in progress
+
 TODO LIST
 * Logic to weigh interesting characteristics against uninteresting characteristics
 * We are looking for pastes with LARGE NUMBERS of emails, hashes, and credentials.
@@ -21,29 +28,3 @@ SIMILAR PROJECTS
 KNOWN ISSUES
 * private keys match against hashes
 * userpass: needs to exclude urls (http://)
-
-MATCH IDEAS
-* Get a better list of hacker groups
-* Proxies?
-* SQL injections/XSS (SQLI/XSS keywords). Maybe file inclusions
-    * In addition to SQL keywords, maybe a match on id=<num>'
-* "dox"
-    * possible additional keywords: facebook, twitter, family,
-* "greetz/greets"
-* "compromise/dump/hack/target"
-* ip addresses?
-* mysql_connect (database connection strings)
-* CREDIT CARDS
-    * actual credit cards
-    * "visa", "mastercard", "amex"
- * Bitcoin
-    * Addresses
-    * "BTC"
-
-
-* Paste sites: Pastiebin, Slexy, Pastie, LodgeIt, YourPaste, Pastebay, FrubarPaste
-Confirmed to be scraped by someone else
-* None archived paste sites: Ghostbin, zerobin
-    * Will require a rotating list of HTTP proxies to avoid being IP blocked. Another project for another day...
-* LIST: https://inteltechniques.com/OSINT/pastebins.html (57 paste sites)
-* LIST: https://blog.c22.cc/2012/02/28/quick-post-list-of-paste-sites/
